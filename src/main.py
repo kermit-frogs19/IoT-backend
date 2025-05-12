@@ -18,6 +18,7 @@ from src.database.models import *
 from src.database.managers import *
 from src.api.api.users_api import UsersAPI
 from src.api.api.devices_api import DevicesAPI
+from src.api.api.commands_api import CommandsAPI
 from src.api.rpc.system_rpc import SystemRPC
 
 logging.basicConfig(
@@ -39,6 +40,7 @@ command_manager = CommandManager(db_client=database_client)
 # Initializing API classes
 users_api = UsersAPI("/users", user_manager=user_manager)
 devices_api = DevicesAPI("/devices", device_manager=device_manager)
+commands_api = CommandsAPI("/commands", command_manager=command_manager)
 
 # Initializing RPC classes
 system_rpc = SystemRPC(db_client=database_client, device_manager=device_manager, command_manager=command_manager)
@@ -91,6 +93,8 @@ ezrpc_server = Receiver(
 # Connecting routes of API classes to the FastAPI server
 fastapi_app.include_router(router=users_api.router)
 fastapi_app.include_router(router=devices_api.router)
+fastapi_app.include_router(router=commands_api.router)
+
 
 # Adding CORS middleware to FastAPI app
 fastapi_app.add_middleware(
@@ -124,7 +128,7 @@ async def system_stop():
 
 
 async def main():
-    config = Config(app=fastapi_app, host="0.0.0.0", port=443)
+    config = Config(app=fastapi_app, host="0.0.0.0", port=5000)
     server = Server(config)
 
     # Run both REST and RPC (ezRPC) servers in the same app and host, but on different ports

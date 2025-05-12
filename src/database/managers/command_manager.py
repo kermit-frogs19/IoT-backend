@@ -50,8 +50,8 @@ class CommandManager:
             status: int = None,
     ) -> Command:
         async with self.db_client.AsyncSessionDB() as session:
-            if not __command and any(value is None for value in [date_time, device_id, command, kwargs, status]):
-                raise ValueError(f"Incorrect values for user creation")
+            if not __command and any(value is None for value in [device_id, command, kwargs, status]):
+                raise ValueError(f"Incorrect values for command creation")
 
             # Step 1: Find the user by email
             result = await session.execute(

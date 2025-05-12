@@ -44,7 +44,7 @@ class DeviceManager:
     ) -> Device:
         async with self.db_client.AsyncSessionDB() as session:
             if not __device and any(val is None for val in [name, user_id, status, regime]):
-                raise ValueError(f"Incorrect values for user creation")
+                raise ValueError(f"Incorrect values for device creation")
 
             # Step 1: Find the user by email
             result = await session.execute(
