@@ -1,5 +1,5 @@
 fastapi~=0.115.12
 SQLAlchemy~=2.0.40
 uvicorn~=0.34.2
-ezRPC @ git+https://github.com/kermit-frogs19/ezh3.git@2a6582a0ed6fcc8cbfbce5f03eb007ce50be6c2e
+ezRPC @ git+https://github.com/kermit-frogs19/ezRPC.git@2a6582a0ed6fcc8cbfbce5f03eb007ce50be6c2e
 python-dotenv~=1.1.0
