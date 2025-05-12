@@ -16,6 +16,7 @@ logger = Logger()
 from src.database.database_client import DatabaseClient
 from src.database.models import *
 from src.database.managers import *
+from src.logic.time_checker import TimeChecker
 from src.api.api.users_api import UsersAPI
 from src.api.api.devices_api import DevicesAPI
 from src.api.api.commands_api import CommandsAPI
@@ -36,6 +37,7 @@ database_client = DatabaseClient(db_dsn=DATABASE_URL)
 user_manager = UserManager(db_client=database_client)
 device_manager = DeviceManager(db_client=database_client)
 command_manager = CommandManager(db_client=database_client)
+time_checker = TimeChecker(device_manager=device_manager, command_manager=command_manager)
 
 # Initializing API classes
 users_api = UsersAPI("/users", user_manager=user_manager)
@@ -43,7 +45,7 @@ devices_api = DevicesAPI("/devices", device_manager=device_manager)
 commands_api = CommandsAPI("/commands", command_manager=command_manager)
 
 # Initializing RPC classes
-system_rpc = SystemRPC(db_client=database_client, device_manager=device_manager, command_manager=command_manager)
+system_rpc = SystemRPC(db_client=database_client, device_manager=device_manager, command_manager=command_manager, time_checker=time_checker)
 
 
 # If the app is running in production (i.e. in Unix-based system) - try to use uvloop event loop, instead of asyncio.

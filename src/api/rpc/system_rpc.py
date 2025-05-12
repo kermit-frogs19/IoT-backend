@@ -4,6 +4,7 @@ from src.database.managers import *
 from src.database.models import *
 from src.database.database_client import DatabaseClient
 from src.common.logger import Logger
+from src.logic.time_checker import TimeChecker
 
 
 class SystemRPC:
@@ -11,15 +12,18 @@ class SystemRPC:
             self,
             db_client: DatabaseClient,
             device_manager: DeviceManager,
-            command_manager: CommandManager
+            command_manager: CommandManager,
+            time_checker: TimeChecker
     ):
         self.db_client = db_client
         self.device_manager = device_manager
         self.command_manager = command_manager
+        self.time_checker = time_checker
 
         self.logger = Logger()
 
     async def get_commands(self, device_id: int) -> list:
+        await self.time_checker.check(device_id)
         commands = await self.command_manager.get(device_id=device_id, status=0)
         commands_dict = [{
             "id": command.id,
@@ -34,7 +38,7 @@ class SystemRPC:
             stmt = (
                 update(Command)
                 .where(Command.id.in_({command.id for command in commands}))
-                .values(**{"status": 0})
+                .values(**{"status": 1})
                 .execution_options(synchronize_session="fetch")
             )
             await session.execute(stmt)
