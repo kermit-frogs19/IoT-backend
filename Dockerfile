@@ -27,10 +27,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app code
 COPY . .
 
-
 # Expose UDP port used by QUIC
 EXPOSE 8080/udp
 EXPOSE 443
+
+# Set the PYTHONPATH environment variable so that Python can find the `src` module
+ENV PYTHONPATH=/app
 
 # Run your QUIC server
 CMD ["python", "src/main.py"]
