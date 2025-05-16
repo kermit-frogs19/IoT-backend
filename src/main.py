@@ -120,6 +120,21 @@ ezrpc_server.add_function(dummy)
 uvicorn_server = Server(Config(app=fastapi_app, host="0.0.0.0", port=443))
 
 
+@ezrpc_server.function(description="Get sum of 2 integers")
+async def get_sum(a: int, b: int) -> int:
+    return a + b
+
+
+@ezrpc_server.function(description="Get subtraction of 2 integers")
+async def get_subtraction(a: int, b: int) -> int:
+    return a - b
+
+
+@ezrpc_server.function(description="Echo...")
+async def echo(phrase: str) -> str:
+    return phrase
+
+
 async def system_start():
     await database_client.start()
 
