@@ -6,11 +6,6 @@ from ezRPC import Receiver
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
-import grpc
-from concurrent import futures
-import time
-import ping_pb2
-import ping_pb2_grpc
 
 from src.common.logger import Logger
 
@@ -31,21 +26,6 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
     level=logging.DEBUG,
 )
-
-class PingerServicer(ping_pb2_grpc.PingerServicer):
-    def Ping(self, request, context):
-        return ping_pb2.Empty()
-
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    ping_pb2_grpc.add_PingerServicer_to_server(PingerServicer(), server)
-    server.add_insecure_port('[::]:50051')
-    server.start()
-    print("gRPC server started on port 50051")
-    server.wait_for_termination()
-
-if __name__ == '__main__':
-    serve()
 
 
 # Replace with your actual credentials
@@ -106,7 +86,7 @@ ezrpc_server = Receiver(
     title="IoT-backend-RPC",
     host="0.0.0.0",
     port=8000,
-    enable_tls=False,
+    enable_tls=True,
     enable_ipv6=True,
     custom_cert_file_loc="/app/cert.pem",
     custom_cert_key_file_loc="/app/key.pem"
@@ -179,8 +159,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    serve()
-    # asyncio.run(main())
+    asyncio.run(main())
     # asyncio.run(rpc.run())
 
 
