@@ -86,7 +86,7 @@ ezrpc_server = Receiver(
     title="IoT-backend-RPC",
     host="0.0.0.0",
     port=8000,
-    enable_tls=True,
+    enable_tls=False,
     enable_ipv6=True,
     custom_cert_file_loc="/app/cert.pem",
     custom_cert_key_file_loc="/app/key.pem"
@@ -118,6 +118,11 @@ ezrpc_server.add_function(dummy)
 
 # Initializing uvicorn server and connecting the FastAPI instance to it
 uvicorn_server = Server(Config(app=fastapi_app, host="0.0.0.0", port=443))
+
+
+@fastapi_app.get("/")
+async def home_page():
+    return {"message": "Application is running!"}
 
 
 @ezrpc_server.function(description="Get sum of 2 integers")
