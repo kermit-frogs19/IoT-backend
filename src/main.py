@@ -7,6 +7,12 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 
+import grpc
+from concurrent import futures
+import time
+import ping_pb2
+import ping_pb2_grpc
+
 from src.common.logger import Logger
 
 # Load environment variables from .env file & create a logger instance before making any internal imports
@@ -155,23 +161,38 @@ async def system_stop():
     ezrpc_server.shutdown()
 
 
-async def main():
-    config = Config(app=fastapi_app, host="0.0.0.0", port=5000)
-    server = Server(config)
+class PingerServicer(ping_pb2_grpc.PingerServicer):
+    def Ping(self, request, context):
+        return ping_pb2.Empty()
 
-    # Run both REST and RPC (ezRPC) servers in the same app and host, but on different ports
-    try:
-        await asyncio.gather(
-            server.serve(),
-            ezrpc_server.run()
-        )
-    except (KeyboardInterrupt, asyncio.CancelledError):
-        logger.error("system: System stopped manually")
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    ping_pb2_grpc.add_PingerServicer_to_server(PingerServicer(), server)
+    server.add_insecure_port('[::]:50051')
+    server.start()
+    print("gRPC server started on port 50051")
+    server.wait_for_termination()
 
+if __name__ == '__main__':
+    serve()
 
-if __name__ == "__main__":
-    asyncio.run(main())
-    # asyncio.run(rpc.run())
+# async def main():
+#     config = Config(app=fastapi_app, host="0.0.0.0", port=5000)
+#     server = Server(config)
+#
+#     # Run both REST and RPC (ezRPC) servers in the same app and host, but on different ports
+#     try:
+#         await asyncio.gather(
+#             server.serve(),
+#             ezrpc_server.run()
+#         )
+#     except (KeyboardInterrupt, asyncio.CancelledError):
+#         logger.error("system: System stopped manually")
+#
+#
+# if __name__ == "__main__":
+#     asyncio.run(main())
+#     # asyncio.run(rpc.run())
 
 
 
