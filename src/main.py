@@ -140,6 +140,12 @@ async def echo(phrase: str) -> str:
     return phrase
 
 
+@ezrpc_server.function()
+async def wait(seconds: int) -> None:
+    print(f"Sleeping for {seconds} second(s) ...")
+    await asyncio.sleep(seconds)
+
+
 async def system_start():
     await database_client.start()
 
