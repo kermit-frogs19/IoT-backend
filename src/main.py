@@ -28,10 +28,10 @@ from src.api.api.devices_api import DevicesAPI
 from src.api.api.commands_api import CommandsAPI
 from src.api.rpc.system_rpc import SystemRPC
 
-logging.basicConfig(
-    format="%(asctime)s %(levelname)s %(name)s %(message)s",
-    level=logging.DEBUG,
-)
+# logging.basicConfig(
+#     format="%(asctime)s %(levelname)s %(name)s %(message)s",
+#     level=logging.DEBUG,
+# )
 
 
 # Replace with your actual credentials
@@ -56,13 +56,13 @@ system_rpc = SystemRPC(db_client=database_client, device_manager=device_manager,
 
 # If the app is running in production (i.e. in Unix-based system) - try to use uvloop event loop, instead of asyncio.
 # Because uvloop is not supported  on Windows
-try:
-    import uvloop
-    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-    logger.info("system: Using uvloop for asyncio event loop")
-except ImportError:
-    uvloop = None
-    logger.warning("system: Failed to import/connect uvloop for asyncio event loop")
+# try:
+#     import uvloop
+#     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+#     logger.info("system: Using uvloop for asyncio event loop")
+# except ImportError:
+#     uvloop = None
+#     logger.warning("system: Failed to import/connect uvloop for asyncio event loop")
 
 
 # Configure the actions the app will take before startup and shutdown
@@ -165,34 +165,34 @@ class PingerServicer(ping_pb2_grpc.PingerServicer):
     def Ping(self, request, context):
         return ping_pb2.Empty()
 
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    ping_pb2_grpc.add_PingerServicer_to_server(PingerServicer(), server)
-    server.add_insecure_port('[::]:50051')
-    server.start()
-    print("gRPC server started on port 50051")
-    server.wait_for_termination()
+# def serve():
+#     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+#     ping_pb2_grpc.add_PingerServicer_to_server(PingerServicer(), server)
+#     server.add_insecure_port('[::]:50051')
+#     server.start()
+#     print("gRPC server started on port 50051")
+#     server.wait_for_termination()
+#
+# if __name__ == '__main__':
+#     serve()
 
-if __name__ == '__main__':
-    serve()
+async def main():
+    config = Config(app=fastapi_app, host="0.0.0.0", port=5000)
+    server = Server(config)
 
-# async def main():
-#     config = Config(app=fastapi_app, host="0.0.0.0", port=5000)
-#     server = Server(config)
-#
-#     # Run both REST and RPC (ezRPC) servers in the same app and host, but on different ports
-#     try:
-#         await asyncio.gather(
-#             server.serve(),
-#             ezrpc_server.run()
-#         )
-#     except (KeyboardInterrupt, asyncio.CancelledError):
-#         logger.error("system: System stopped manually")
-#
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())
-#     # asyncio.run(rpc.run())
+    # Run both REST and RPC (ezRPC) servers in the same app and host, but on different ports
+    try:
+        await asyncio.gather(
+            server.serve(),
+            ezrpc_server.run()
+        )
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        logger.error("system: System stopped manually")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+    # asyncio.run(rpc.run())
 
 
 
