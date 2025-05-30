@@ -3,7 +3,7 @@ import logging
 from uvicorn import Config, Server
 from fastapi.middleware.cors import CORSMiddleware
 from ezRPC import Receiver
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 
@@ -131,6 +131,11 @@ async def home_page():
     return {"message": "Application is running!"}
 
 
+@fastapi_app.post("/ping")
+async def ping(request: Request):
+    return {"message": "success"}
+
+
 @ezrpc_server.function(description="Get sum of 2 integers")
 async def get_sum(a: int, b: int) -> int:
     return a + b
@@ -161,10 +166,10 @@ async def system_stop():
     ezrpc_server.shutdown()
 
 
-class PingerServicer(ping_pb2_grpc.PingerServicer):
-    def Ping(self, request, context):
-        return ping_pb2.Empty()
-
+# class PingerServicer(ping_pb2_grpc.PingerServicer):
+#     def Ping(self, request, context):
+#         return ping_pb2.Empty()
+#
 # def serve():
 #     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 #     ping_pb2_grpc.add_PingerServicer_to_server(PingerServicer(), server)
